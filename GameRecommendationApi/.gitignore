@@ -1,0 +1,28 @@
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Build directories
+bin/
+obj/
+.vs/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# IDE specific
+.idea/
+*.swp
+*.swo
+*~

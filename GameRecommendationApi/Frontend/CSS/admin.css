@@ -1,0 +1,198 @@
+/* Admin main area */
+#adminMain {
+    padding: 20px 0 60px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(255,255,255,0.01));
+}
+
+#adminMain h2 {
+    color: var(--steam-light-blue);
+    margin-bottom: 12px;
+}
+
+.admin-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+/* Admin table */
+.admin-table-container {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.18);
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.02);
+}
+
+#adminTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#adminTable th, #adminTable td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.admin-thumb { width: 64px; height: 64px; object-fit: cover; border-radius:4px; }
+
+.btn-delete { background: #a32a2a; color: white; border: none; padding: 6px 8px; cursor: pointer; border-radius:4px; }
+.btn-edit { background: #2a475e; color: white; border: none; padding: 6px 8px; cursor: pointer; margin-right: 6px; border-radius:4px; }
+
+/* Admin form in modal */
+#adminGameForm { display: block; }
+#adminGameForm .form-row { display: flex; flex-direction: column; gap: 6px; }
+#adminGameForm label { display:block; margin:0; color: var(--steam-text-gray); font-weight:600; font-size: 0.9rem; }
+#adminGameForm input, #adminGameForm textarea { width:100%; padding:10px; margin-top:6px; background: #1f3242; border: 1px solid rgba(255,255,255,0.03); color: var(--steam-text-gray); border-radius:4px; }
+#adminGameForm textarea { min-height:120px; resize:vertical; }
+
+#adminGameForm.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; align-items: start; }
+#adminGameForm.form-grid .form-row.full { grid-column: 1 / -1; }
+#adminGameForm.form-grid .modal-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+
+@media (max-width: 720px) {
+    #adminGameForm.form-grid { grid-template-columns: 1fr; }
+    #adminGameForm textarea { min-height: 120px; }
+}
+
+@media (max-width: 720px) {
+    #adminTable th, #adminTable td { padding: 8px; }
+    .admin-controls { flex-direction: column; align-items: stretch; }
+    .admin-thumb { width: 48px; height: 48px; }
+}
+
+#adminTable tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.danger-btn { background: linear-gradient(180deg,#c62828,#8e1a1a); color: white; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; }
+.danger-btn:hover { filter: brightness(1.04); }
+
+.edit-game-btn, .btn-edit {
+    background: linear-gradient(180deg,#2a475e,#233447);
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform .08s ease, filter .08s ease;
+}
+.edit-game-btn:hover, .btn-edit:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+.delete-game-btn, .btn-delete {
+    background: linear-gradient(180deg,#c62828,#8e1a1a);
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform .08s ease, filter .08s ease;
+}
+.delete-game-btn:hover, .btn-delete:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+#addNewGameBtn {
+    background: linear-gradient(to right, #75b022 5%, #588a1b 95%);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(88,138,27,0.12);
+    transition: transform .08s ease, filter .12s ease;
+}
+#addNewGameBtn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+
+#adminModal .modal-content {
+    max-width: 720px;
+    padding: 22px 22px 26px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+#confirmDeleteModal .modal-content {
+    max-width: 520px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    position: relative;
+    display: block;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.45);
+}
+
+#confirmDeleteModal .close-confirm-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.14);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#confirmDeleteModal .modal-body {
+    padding: 14px 4px 6px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+}
+
+#confirmDeleteModal h3 { margin: 6px 0 0 0; color: var(--steam-light-blue); font-size: 1rem; font-weight: 700; }
+#confirmDeleteModal p { margin: 0; color: var(--steam-text-gray); line-height: 1.35; }
+#confirmDeleteModal .modal-actions { margin-top: 8px; display:flex; justify-content:flex-end; gap:10px; }
+
+#confirmDeleteModal .danger-btn { padding: 8px 12px; border-radius: 6px; }
+
+#adminModal .close-admin-modal {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.18);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: transform .08s ease, background .08s ease;
+}
+#adminModal .close-admin-modal:hover { transform: scale(1.06); background: rgba(255,255,255,0.06); }
+
+#adminModal h3 { color: var(--steam-light-blue); margin: 0 0 12px 0; font-size: 1.05rem; font-weight: 700; }
+#adminModal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 8px;
+    align-items: stretch;
+}
+
+#adminGameForm { display: grid; gap: 12px 16px; }
+#adminGameForm .form-row { display: flex; flex-direction: column; gap: 6px; }
+#adminGameForm input, #adminGameForm textarea { padding: 12px; border-radius: 6px; }
+#adminGameForm .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; align-items: center; }
+
+@media (max-width: 420px) {
+    #adminModal .close-admin-modal { right: 10px; top: 10px; width: 32px; height: 32px; font-size: 18px; }
+}
+
+#adminGameForm .primary-btn:hover { filter: brightness(1.04); }
+#adminGameForm .secondary-btn:hover { filter: brightness(1.06); }
+
+#adminGameForm input:focus, #adminGameForm textarea:focus { outline: 2px solid rgba(102,192,244,0.14); outline-offset: 2px; }
+
