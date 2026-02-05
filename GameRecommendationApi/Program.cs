@@ -2,18 +2,42 @@ using GameRecommendationApi.Services;
 using GameRecommendationApi.Services.Interfaces;
 using GameRecommendationApi.Middleware;
 using DotNetEnv;
+using Microsoft.OpenApi.Models;
+
+// Učitaj .env fajl pre nego što kreiramo IConfiguration — tako će vrednosti iz .env biti vidljive
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Učitaj .env fajl
-DotNetEnv.Env.Load();
-
 builder.Services.AddControllers();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Swagger: dodaj ApiKey security schema tako da Swagger UI može poslati `Authorization` header
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Enter the API key value (no 'Bearer ' prefix)."
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" },
+                In = ParameterLocation.Header,
+                Name = "Authorization"
+            },
+            new string[] { }
+        }
+    });
+});
+
 // kada kontroleru zatreba neko da obradi zahtev (rad sa bazom), na osnovu ovg spiska zna kog da zove
 builder.Services.AddSingleton<Neo4jService>();
 builder.Services.AddScoped<IMetadataService, MetadataService>();
@@ -38,7 +62,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Serve frontend images from /images route (physical folder Frontend/Images)
+
 var imagesPath = Path.Combine(app.Environment.ContentRootPath, "Frontend", "Images");
 if (Directory.Exists(imagesPath))
 {
@@ -60,7 +84,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CORS");
 app.UseAuthorization();
-// Registruj Authorization Middleware
+
 app.UseMiddleware<AuthorizationMiddleware>();
 app.MapControllers();
 app.Run();

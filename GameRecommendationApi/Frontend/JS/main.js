@@ -6,7 +6,7 @@
 import { appState, loadFavoritesFromStorage, saveFavoritesToStorage, getUserKey } from './state.js';
 import { fetchAllGames, searchGamesAPI, fetchRecommendationsAPI, toggleWishlistAPI, fetchFiltersAPI, fetchUsersAPI, fetchUserLikes, deleteGameAPI } from './api.js';
 import { renderGames, renderFilters, renderAdminTable, renderUserSelect } from './render.js';
-import { debounce, getSelectedFilters, filterGamesLocally, API_BASE } from './utils.js';
+import { debounce, getSelectedFilters, filterGamesLocally, API_BASE, apiFetch } from './utils.js';
 import { toggleUserAdminView, switchTabUI, openDetailsModal, closeModal, openAdminFormModal } from './ui.js';
 
 // --- Inicijalizacija ---
@@ -246,7 +246,7 @@ function setupEventListeners() {
         if (mode === 'create') {
 
             const body = { Game: { title, about: description, imagePath: image, releaseYear: year, developers: developer ? [developer] : [] }, DeveloperName: developer, GenreNames: genres, MechanicNames: mechanics };
-            const res = await fetch(`${API_BASE}/create?performedBy=${encodeURIComponent(username)}`, {
+            const res = await apiFetch(`${API_BASE}/create?performedBy=${encodeURIComponent(username)}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
             });
             if (res.ok) {
@@ -262,7 +262,7 @@ function setupEventListeners() {
             }
         } else {
             const updated = { id: Number(editId), title, developers: developer ? [developer] : [], releaseYear: year, imagePath: image, genres, mechanics, about: description };
-            const res = await fetch(`${API_BASE}/${editId}?performedBy=${encodeURIComponent(username)}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updated) });
+            const res = await apiFetch(`${API_BASE}/${editId}?performedBy=${encodeURIComponent(username)}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updated) });
             if (res.ok) {
                 closeModal('adminModal');
                 const games = await fetchAllGames();

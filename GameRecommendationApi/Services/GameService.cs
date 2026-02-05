@@ -7,10 +7,12 @@ namespace GameRecommendationApi.Services;
 public class GameService : IGameService
 {
     private readonly Neo4jService _neo4j;
+    private readonly string _imagesFolder;
 
-    public GameService(Neo4jService neo4j)
+    public GameService(Neo4jService neo4j, IWebHostEnvironment env)
     {
         _neo4j = neo4j;
+        _imagesFolder = Path.Combine(env.ContentRootPath, "Frontend", "Images");
     }
 
     public async Task<List<Game>> SearchGamesAsync(
@@ -159,7 +161,7 @@ public class GameService : IGameService
         }).ToList();
     }
 
-        public async Task<List<Game>> GetAllGamesAsync(int? maxResults = 50)
+        public async Task<List<Game>> GetAllGamesAsync(int? maxResults = 1000)
     {
         await using var session = _neo4j.Driver.AsyncSession();
 
@@ -176,7 +178,7 @@ public class GameService : IGameService
             ORDER BY game.title ASC
             LIMIT $limit";
 
-        var records = await session.RunAsync(cypher, new { limit = maxResults ?? 50 });
+        var records = await session.RunAsync(cypher, new { limit = maxResults ?? 1000 });
         var results = await records.ToListAsync();
 
         return results.Select(r => MapGameRecord(r)).ToList();
@@ -193,11 +195,29 @@ public class GameService : IGameService
             Title = gameDict["title"].As<string>(),
             ReleaseYear = gameDict["releaseYear"].As<int>(),
             About = gameDict.ContainsKey("about") ? gameDict["about"].As<string?>() : null,
-            ImagePath = gameDict.ContainsKey("imagePath") ? gameDict["imagePath"].As<string?>() : null,
+            ImagePath = ResolveImagePath(gameDict.ContainsKey("imagePath") ? gameDict["imagePath"].As<string?>() : null),
             Genres = record["genres"].As<List<string>>(),
             Developers = record["developers"].As<List<string>>(),
             Mechanics = record["mechanics"].As<List<string>>()
         };
+    }
+
+    private string? ResolveImagePath(string? original)
+    {
+        if (string.IsNullOrWhiteSpace(original)) return null;
+
+        var normalized = NormalizeImagePath(original) ?? original;
+
+        var localRelative = (normalized.StartsWith('/') ? normalized.Substring(1) : normalized);
+        var candidate = Path.Combine(_imagesFolder, localRelative.Replace("/", Path.DirectorySeparatorChar.ToString()));
+        if (File.Exists(candidate)) return normalized;
+
+        var alt = System.Text.RegularExpressions.Regex.Replace(normalized, "\u002e(jpe?g|png)$", ".webp", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        localRelative = (alt.StartsWith('/') ? alt.Substring(1) : alt);
+        candidate = Path.Combine(_imagesFolder, localRelative.Replace("/", Path.DirectorySeparatorChar.ToString()));
+        if (File.Exists(candidate)) return alt;
+
+        return normalized;
     }
 
     public async Task<Game> CreateGameAsync(Game game, string developerName, List<string> genreNames, List<string> mechanicNames, string performedByUsername)
@@ -207,6 +227,19 @@ public class GameService : IGameService
         // Provera admin prava
         var isAdmin = await IsAdminAsync(session, performedByUsername);
         if (!isAdmin) throw new UnauthorizedAccessException("Samo admin može dodavati igre");
+
+        // Ako je nova igra (Id == 0) → uzmi sledeći broj iz countera
+        if (game.Id == 0)
+        {
+            var counterCypher = @"
+                MERGE (c:Counter {name: 'Game'})
+                SET c.nextId = coalesce(c.nextId, 0) + 1
+                RETURN c.nextId AS newId";
+
+            var counterCursor = await session.RunAsync(counterCypher);
+            var counterRecord = await counterCursor.SingleAsync();
+            game.Id = counterRecord["newId"].As<int>();
+        }
 
         var cypher = @"
             // Kreiranje ili pronalaženje developera

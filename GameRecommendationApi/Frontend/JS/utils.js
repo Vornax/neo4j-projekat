@@ -33,46 +33,52 @@ export function debounce(fn, delay = 300) {
 // bilo da je u pitanju lokalni fajl na serveru ili eksterni link.
 export function normalizeImagePath(game) {
     if (!game) return game;
-    
-    let raw = game.imagePath || game.image || null;
 
-    // Provera da li je putanja prazna ili sadrži string "undefined"/"null"
-    if (typeof raw === 'string' && (/^\s*undefined\s*$/i.test(raw) || /^\s*null\s*$/i.test(raw))) {
-        raw = null;
-    }
-    
-    if (!raw) {
-        game.image = 'https://via.placeholder.com/220x300?text=No+Image';
+    // lightweight SVG data-URI placeholder (works offline)
+    const DATA_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 300'>" +
+        "<rect width='100%' height='100%' fill='%23efefef'/>" +
+        "<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23666' font-family='Arial,Helvetica,sans-serif' font-size='20'>No Image</text>" +
+        "</svg>"
+    );
+
+    let raw = (game.imagePath || game.image || '').toString().trim();
+
+    // empty / explicit null/undefined strings -> use placeholder
+    if (!raw || /^\s*(undefined|null)\s*$/i.test(raw)) {
+        game.image = DATA_PLACEHOLDER;
         return game;
     }
 
-    // Normalizacija kosing crta i foldera Images -> images
-    const rawNoLeading = String(raw).replace(/^\/*/, '');
+    // If it's already an absolute URL, keep it exactly as provided (do NOT prepend '/').
+    if (/^https?:\/\//i.test(raw)) {
+        game.imagePath = raw;
+        game.image = raw;
+        if (game.about && !game.description) game.description = game.about;
+        return game;
+    }
+
+    // Normalize relative/local paths (remove extra leading slashes)
+    const rawNoLeading = raw.replace(/^\/*/, '');
     let path;
-    
+
     if (!rawNoLeading.includes('/')) {
         path = `/images/${rawNoLeading}`;
     } else {
-        path = String(raw).replace(/^\/*/, '/');
+        path = '/' + rawNoLeading;
         path = path.replace(/^\/Images/i, '/images');
     }
 
-    // Ako putanja vodi do lokalnog foldera, dodajemo host API servera
+    // If path points to local /images folder, prefix API host
     if (path.toLowerCase().startsWith('/images')) {
         const apiHost = API_BASE.replace(/\/api\/Games\/?$/i, '');
         game.imagePath = `${apiHost}${path}`;
-    } else if (!/^https?:\/\//i.test(path)) {
-        game.imagePath = path;
     } else {
         game.imagePath = path;
     }
 
-    // Postavljanje finalne image osobine koju renderer koristi
-    game.image = game.imagePath || 'https://via.placeholder.com/220x300?text=No+Image';
-
-    // Kompatibilnost unazad: ako server vrati 'about', a frontend očekuje 'description'
+    game.image = game.imagePath || DATA_PLACEHOLDER;
     if (game.about && !game.description) game.description = game.about;
-
     return game;
 }
 

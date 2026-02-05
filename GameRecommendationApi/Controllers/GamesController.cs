@@ -57,7 +57,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<ActionResult<List<Game>>> GetAll([FromQuery] int? maxResults = 50)
+    public async Task<ActionResult<List<Game>>> GetAll([FromQuery] int? maxResults = 1000)
     {
         var games = await _gameService.GetAllGamesAsync(maxResults);
         return Ok(games);

@@ -1,8 +1,12 @@
-// 1. Čišćenje baze
-MATCH (n) 
-DETACH DELETE n;
-
+// ====== 01_init.cypher ======
 // ---------------------------------------------------------
+
+MERGE (c:Counter {name: 'Game'})
+SET c.nextId = coalesce(c.nextId, 0);
+
+CREATE CONSTRAINT IF NOT EXISTS
+FOR (g:Game)
+REQUIRE g.id IS UNIQUE;
 
 // 2. Kreiranje Korisnika (2)
 MERGE (u1:User {username: "admin"}) 
@@ -129,10 +133,6 @@ SET g.title = gameData.title,
     g.imagePath = gameData.imagePath;
 
 // ---------------------------------------------------------
-
-// Kraj skripte
-RETURN "Baza je spremna sa 202 čvora!";
-
 
 // =================================================================
 // 1. POVEZIVANJE IGARA SA DEVELOPERIMA  (:DEVELOPED_BY)
@@ -464,3 +464,9 @@ MATCH (m:Mechanic {name: mechName})
 MERGE (g)-[:HAS_MECHANIC]->(m);
 
 RETURN "Sve relacije su dodane – developeri, žanrovi i mehanike!";
+
+// --- Fix image extensions to .webp for frontend assets (idempotent)
+MATCH (g:Game)
+WHERE g.imagePath ENDS WITH '.jpg'
+SET g.imagePath = replace(g.imagePath, '.jpg', '.webp')
+RETURN count(g) AS updatedImagePaths;

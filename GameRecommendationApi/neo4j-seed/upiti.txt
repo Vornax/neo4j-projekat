@@ -1,0 +1,472 @@
+// ====== 01_init.cypher ======
+// ---------------------------------------------------------
+
+MERGE (c:Counter {name: 'Game'})
+SET c.nextId = coalesce(c.nextId, 0);
+
+CREATE CONSTRAINT IF NOT EXISTS
+FOR (g:Game)
+REQUIRE g.id IS UNIQUE;
+
+// 2. Kreiranje Korisnika (2)
+MERGE (u1:User {username: "admin"}) 
+SET u1.role = "admin";
+
+MERGE (u2:User {username: "guest"}) 
+SET u2.role = "user";
+
+// ---------------------------------------------------------
+
+// 3. Kreiranje Developera (47)
+UNWIND [
+  "Rockstar Games", "CD Projekt RED", "Mojang Studios", "FromSoftware",
+  "Respawn Entertainment", "Naughty Dog", "Santa Monica Studio", "Nintendo EPD",
+  "Guerrilla Games", "Bungie", "Ubisoft Montreal", "Insomniac Games",
+  "Larian Studios", "Avalanche Software", "Capcom", "Kojima Productions",
+  "Remedy Entertainment", "id Software", "Supergiant Games", "Sucker Punch Productions",
+  "InnerSloth", "Epic Games", "Riot Games", "Valve Corporation",
+  "ConcernedApe", "Re-Logic", "Team Cherry", "Maddy Makes Games",
+  "ZA/UM", "Mobius Digital", "Hazelight Studios", "Irrational Games",
+  "BioWare", "Crystal Dynamics", "Ubisoft Toronto", "Atlus",
+  "Square Enix", "BioWare Edmonton", "Bethesda Game Studios", "Obsidian Entertainment",
+  "Arkane Studios", "MachineGames", "IO Interactive", "Hello Games",
+  "Annapurna Interactive", "Thatgamecompany", "Paradox Interactive"
+] AS devName
+MERGE (:Developer {name: devName});
+
+// ---------------------------------------------------------
+
+// 4. Kreiranje Žanrova (50)
+UNWIND [
+  "Action", "Adventure", "Role-Playing", "Strategy", "Simulation",
+  "Sports", "Racing", "Fighting", "Shooter", "First-Person Shooter",
+  "Third-Person Shooter", "Platformer", "Puzzle", "Horror", "Survival Horror",
+  "Survival", "Open World", "Sandbox", "Stealth", "Metroidvania",
+  "Roguelike", "Roguelite", "Turn-Based Strategy", "Real-Time Strategy",
+  "MOBA", "Battle Royale", "Card Game", "Deck-Building", "Tactical RPG",
+  "JRPG", "WRPG", "Visual Novel", "Interactive Fiction", "Point-and-Click Adventure",
+  "Text Adventure", "Action-Adventure", "Hack and Slash", "Soulslike",
+  "MMORPG", "MMO", "Idle", "Clicker", "Rhythm", "Music", "Party",
+  "Casual", "Educational", "Tower Defense", "4X Strategy", "City Builder"
+] AS genreName
+MERGE (:Genre {name: genreName});
+
+// ---------------------------------------------------------
+
+// 5. Kreiranje Mehanika (50)
+UNWIND [
+  "Open-World", "Crafting", "Survival", "Building", "Exploration",
+  "Stealth", "Parkour", "Shooting", "Melee Combat", "Cover Shooter",
+  "Turn-Based Combat", "Real-Time Combat", "Roguelike Permadeath",
+  "Procedural Generation", "Loot System", "Inventory Management",
+  "Skill Tree", "Leveling Up", "Dialogue Choices", "Branching Narrative",
+  "Quick Time Events", "Platforming", "Puzzle Solving", "Resource Management",
+  "Base Building", "Vehicle Driving", "Horse Riding", "Fishing", "Hunting",
+  "Cooking", "Farming", "Time Management", "Day/Night Cycle", "Weather Effects",
+  "Co-op Multiplayer", "PvP Combat", "Squad Commands", "Companion AI",
+  "Summoning", "Magic System", "Elemental Interactions", "Combo Attacks",
+  "Dodge & Roll", "Stamina Management", "Bullet Time", "Slow Motion",
+  "Wall Running", "Grappling Hook", "Climbing", "Swimming"
+] AS mechName
+MERGE (:Mechanic {name: mechName});
+
+// ---------------------------------------------------------
+
+// 6. Kreiranje Igara (50)
+UNWIND [
+  {id:1,  title:"Grand Theft Auto V", releaseYear:2013, about:"Open-world crime epic with three protagonists", imagePath:"/Images/gta-v.jpg"},
+  {id:2,  title:"Red Dead Redemption 2", releaseYear:2018, about:"Western masterpiece with deep story and survival", imagePath:"/Images/rdr2.jpg"},
+  {id:3,  title:"The Witcher 3: Wild Hunt", releaseYear:2015, about:"Dark fantasy RPG with massive open world", imagePath:"/Images/witcher3.jpg"},
+  {id:4,  title:"Minecraft", releaseYear:2011, about:"Sandbox building, crafting and exploration", imagePath:"/Images/minecraft.jpg"},
+  {id:5,  title:"Elden Ring", releaseYear:2022, about:"Open-world souls-like with breathtaking world", imagePath:"/Images/elden-ring.jpg"},
+  {id:6,  title:"Cyberpunk 2077", releaseYear:2020, about:"Dystopian RPG in futuristic Night City", imagePath:"/Images/cyberpunk2077.jpg"},
+  {id:7,  title:"God of War (2018)", releaseYear:2018, about:"Norse mythology action-adventure", imagePath:"/Images/god-of-war-2018.jpg"},
+  {id:8,  title:"The Legend of Zelda: Breath of the Wild", releaseYear:2017, about:"Revolutionary open-world adventure", imagePath:"/Images/zelda-botw.jpg"},
+  {id:9,  title:"Horizon Zero Dawn", releaseYear:2017, about:"Post-apocalyptic robotic world", imagePath:"/Images/horizon-zero-dawn.jpg"},
+  {id:10, title:"God of War Ragnarök", releaseYear:2022, about:"Epic conclusion to Norse saga", imagePath:"/Images/god-of-war-ragnarok.jpg"},
+  {id:11, title:"Assassin's Creed Valhalla", releaseYear:2020, about:"Viking open-world RPG", imagePath:"/Images/ac-valhalla.jpg"},
+  {id:12, title:"Spider-Man 2 (2023)", releaseYear:2023, about:"Superhero action in New York", imagePath:"/Images/spider-man-2.jpg"},
+  {id:13, title:"Baldur's Gate 3", releaseYear:2023, about:"Deep turn-based CRPG masterpiece", imagePath:"/Images/baldurs-gate-3.jpg"},
+  {id:14, title:"Hogwarts Legacy", releaseYear:2023, about:"Wizarding world open-world RPG", imagePath:"/Images/hogwarts-legacy.jpg"},
+  {id:15, title:"Star Wars Jedi: Survivor", releaseYear:2023, about:"Action-adventure in Star Wars universe", imagePath:"/Images/jedi-survivor.jpg"},
+  {id:16, title:"Resident Evil Village", releaseYear:2021, about:"Survival horror with gothic atmosphere", imagePath:"/Images/resident-evil-village.jpg"},
+  {id:17, title:"Death Stranding Director's Cut", releaseYear:2021, about:"Unique delivery experience in post-apocalypse", imagePath:"/Images/death-stranding.jpg"},
+  {id:18, title:"Control", releaseYear:2019, about:"Supernatural third-person action", imagePath:"/Images/control.jpg"},
+  {id:19, title:"Sekiro: Shadows Die Twice", releaseYear:2019, about:"Intense samurai souls-like", imagePath:"/Images/sekiro.jpg"},
+  {id:20, title:"Doom Eternal", releaseYear:2020, about:"Fast-paced demon-slaying FPS", imagePath:"/Images/doom-eternal.jpg"},
+  {id:21, title:"Hades", releaseYear:2020, about:"Roguelike Greek mythology masterpiece", imagePath:"/Images/hades.jpg"},
+  {id:22, title:"Ghost of Tsushima", releaseYear:2020, about:"Samurai open-world action", imagePath:"/Images/ghost-of-tsushima.jpg"},
+  {id:23, title:"Animal Crossing: New Horizons", releaseYear:2020, about:"Relaxing life simulation", imagePath:"/Images/animal-crossing-nh.jpg"},
+  {id:24, title:"Among Us", releaseYear:2018, about:"Social deduction multiplayer game", imagePath:"/Images/among-us.jpg"},
+  {id:25, title:"Fortnite", releaseYear:2017, about:"Battle royale with building mechanics", imagePath:"/Images/fortnite.jpg"},
+  {id:26, title:"Valorant", releaseYear:2020, about:"Tactical 5v5 shooter", imagePath:"/Images/valorant.jpg"},
+  {id:27, title:"League of Legends", releaseYear:2009, about:"Iconic MOBA game", imagePath:"/Images/league-of-legends.jpg"},
+  {id:28, title:"Counter-Strike 2", releaseYear:2023, about:"Legendary competitive FPS", imagePath:"/Images/cs2.jpg"},
+  {id:29, title:"Stardew Valley", releaseYear:2016, about:"Farming life simulation RPG", imagePath:"/Images/stardew-valley.jpg"},
+  {id:30, title:"Terraria", releaseYear:2011, about:"2D sandbox adventure", imagePath:"/Images/terraria.jpg"},
+  {id:31, title:"Hollow Knight", releaseYear:2017, about:"Beautiful metroidvania", imagePath:"/Images/hollow-knight.jpg"},
+  {id:32, title:"Celeste", releaseYear:2018, about:"Challenging precision platformer", imagePath:"/Images/celeste.jpg"},
+  {id:33, title:"Disco Elysium", releaseYear:2019, about:"Deep narrative detective RPG", imagePath:"/Images/disco-elysium.jpg"},
+  {id:34, title:"Outer Wilds", releaseYear:2019, about:"Exploration time-loop mystery", imagePath:"/Images/outer-wilds.jpg"},
+  {id:35, title:"It Takes Two", releaseYear:2021, about:"Co-op adventure about relationships", imagePath:"/Images/it-takes-two.jpg"},
+  {id:36, title:"Portal 2", releaseYear:2011, about:"Puzzle masterpiece", imagePath:"/Images/portal-2.jpg"},
+  {id:37, title:"Half-Life 2", releaseYear:2004, about:"Revolutionary FPS classic", imagePath:"/Images/half-life-2.jpg"},
+  {id:38, title:"BioShock Infinite", releaseYear:2013, about:"Floating city narrative shooter", imagePath:"/Images/bioshock-infinite.jpg"},
+  {id:39, title:"Mass Effect 2", releaseYear:2010, about:"Sci-fi RPG masterpiece", imagePath:"/Images/mass-effect-2.jpg"},
+  {id:40, title:"The Last of Us Part I", releaseYear:2022, about:"Emotional post-apocalyptic story", imagePath:"/Images/the-last-of-us-1.jpg"},
+  {id:41, title:"The Last of Us Part II", releaseYear:2020, about:"Controversial revenge tale", imagePath:"/Images/the-last-of-us-2.jpg"},
+  {id:42, title:"Uncharted 4: A Thief's End", releaseYear:2016, about:"Cinematic action-adventure", imagePath:"/Images/uncharted-4.jpg"},
+  {id:43, title:"Tomb Raider (2013)", releaseYear:2013, about:"Reboot survival action", imagePath:"/Images/tomb-raider-2013.jpg"},
+  {id:44, title:"Far Cry 5", releaseYear:2018, about:"Open-world FPS in Montana", imagePath:"/Images/far-cry-5.jpg"},
+  {id:45, title:"Watch Dogs 2", releaseYear:2016, about:"Hacker open-world in San Francisco", imagePath:"/Images/watch-dogs-2.jpg"},
+  {id:46, title:"Persona 5 Royal", releaseYear:2020, about:"Stylish JRPG with social elements", imagePath:"/Images/persona-5-royal.jpg"},
+  {id:47, title:"Final Fantasy VII Remake", releaseYear:2020, about:"Modern take on classic JRPG", imagePath:"/Images/ff7-remake.jpg"},
+  {id:48, title:"Dragon Age: Inquisition", releaseYear:2014, about:"Epic fantasy RPG", imagePath:"/Images/dragon-age-inquisition.jpg"},
+  {id:49, title:"Skyrim (The Elder Scrolls V)", releaseYear:2011, about:"Legendary open-world fantasy", imagePath:"/Images/skyrim.jpg"},
+  {id:50, title:"Fallout: New Vegas", releaseYear:2010, about:"Post-apocalyptic RPG classic", imagePath:"/Images/fallout-new-vegas.jpg"}
+] AS gameData
+
+MERGE (g:Game {id: gameData.id})
+SET g.title = gameData.title,
+    g.releaseYear = gameData.releaseYear,
+    g.about = gameData.about,
+    g.imagePath = gameData.imagePath;
+
+// ---------------------------------------------------------
+
+// =================================================================
+// 1. POVEZIVANJE IGARA SA DEVELOPERIMA  (:DEVELOPED_BY)
+//    Sada smer: (Game)-[:DEVELOPED_BY]->(Developer)
+// =================================================================
+
+MATCH (g:Game {title: "Grand Theft Auto V"})
+MATCH (d:Developer {name: "Rockstar Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Red Dead Redemption 2"})
+MATCH (d:Developer {name: "Rockstar Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "The Witcher 3: Wild Hunt"})
+MATCH (d:Developer {name: "CD Projekt RED"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Minecraft"})
+MATCH (d:Developer {name: "Mojang Studios"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Elden Ring"})
+MATCH (d:Developer {name: "FromSoftware"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Cyberpunk 2077"})
+MATCH (d:Developer {name: "CD Projekt RED"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "God of War (2018)"})
+MATCH (d:Developer {name: "Santa Monica Studio"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "The Legend of Zelda: Breath of the Wild"})
+MATCH (d:Developer {name: "Nintendo EPD"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Horizon Zero Dawn"})
+MATCH (d:Developer {name: "Guerrilla Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "God of War Ragnarök"})
+MATCH (d:Developer {name: "Santa Monica Studio"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Assassin's Creed Valhalla"})
+MATCH (d:Developer {name: "Ubisoft Montreal"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Spider-Man 2 (2023)"})
+MATCH (d:Developer {name: "Insomniac Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Baldur's Gate 3"})
+MATCH (d:Developer {name: "Larian Studios"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Hogwarts Legacy"})
+MATCH (d:Developer {name: "Avalanche Software"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Star Wars Jedi: Survivor"})
+MATCH (d:Developer {name: "Respawn Entertainment"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Resident Evil Village"})
+MATCH (d:Developer {name: "Capcom"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Death Stranding Director's Cut"})
+MATCH (d:Developer {name: "Kojima Productions"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Control"})
+MATCH (d:Developer {name: "Remedy Entertainment"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Sekiro: Shadows Die Twice"})
+MATCH (d:Developer {name: "FromSoftware"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Doom Eternal"})
+MATCH (d:Developer {name: "id Software"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Hades"})
+MATCH (d:Developer {name: "Supergiant Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Ghost of Tsushima"})
+MATCH (d:Developer {name: "Sucker Punch Productions"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Animal Crossing: New Horizons"})
+MATCH (d:Developer {name: "Nintendo EPD"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Among Us"})
+MATCH (d:Developer {name: "InnerSloth"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Fortnite"})
+MATCH (d:Developer {name: "Epic Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Valorant"})
+MATCH (d:Developer {name: "Riot Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "League of Legends"})
+MATCH (d:Developer {name: "Riot Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Counter-Strike 2"})
+MATCH (d:Developer {name: "Valve Corporation"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Stardew Valley"})
+MATCH (d:Developer {name: "ConcernedApe"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Terraria"})
+MATCH (d:Developer {name: "Re-Logic"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Hollow Knight"})
+MATCH (d:Developer {name: "Team Cherry"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Celeste"})
+MATCH (d:Developer {name: "Maddy Makes Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Disco Elysium"})
+MATCH (d:Developer {name: "ZA/UM"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Outer Wilds"})
+MATCH (d:Developer {name: "Mobius Digital"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "It Takes Two"})
+MATCH (d:Developer {name: "Hazelight Studios"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Portal 2"})
+MATCH (d:Developer {name: "Valve Corporation"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Half-Life 2"})
+MATCH (d:Developer {name: "Valve Corporation"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "BioShock Infinite"})
+MATCH (d:Developer {name: "Irrational Games"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Mass Effect 2"})
+MATCH (d:Developer {name: "BioWare"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "The Last of Us Part I"})
+MATCH (d:Developer {name: "Naughty Dog"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "The Last of Us Part II"})
+MATCH (d:Developer {name: "Naughty Dog"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Uncharted 4: A Thief's End"})
+MATCH (d:Developer {name: "Naughty Dog"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Tomb Raider (2013)"})
+MATCH (d:Developer {name: "Crystal Dynamics"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Far Cry 5"})
+MATCH (d:Developer {name: "Ubisoft Montreal"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Watch Dogs 2"})
+MATCH (d:Developer {name: "Ubisoft Montreal"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Persona 5 Royal"})
+MATCH (d:Developer {name: "Atlus"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Final Fantasy VII Remake"})
+MATCH (d:Developer {name: "Square Enix"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Dragon Age: Inquisition"})
+MATCH (d:Developer {name: "BioWare Edmonton"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Skyrim (The Elder Scrolls V)"})
+MATCH (d:Developer {name: "Bethesda Game Studios"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+MATCH (g:Game {title: "Fallout: New Vegas"})
+MATCH (d:Developer {name: "Obsidian Entertainment"})
+MERGE (g)-[:DEVELOPED_BY]->(d);
+
+RETURN "Sve DEVELOPED_BY relacije su dodate sa ispravljenim smerom (od Game ka Developer)!";
+
+// =================================================================
+// 2. POVEZIVANJE IGARA SA ŽANROVIMA  (:HAS_GENRE)
+// =================================================================
+
+UNWIND [
+  {title: "Grand Theft Auto V",               genres: ["Action", "Adventure", "Open World", "Shooter"]},
+  {title: "Red Dead Redemption 2",            genres: ["Action", "Adventure", "Open World"]},
+  {title: "The Witcher 3: Wild Hunt",         genres: ["Action", "Adventure", "Role-Playing", "Open World"]},
+  {title: "Minecraft",                        genres: ["Sandbox", "Survival", "Adventure"]},
+  {title: "Elden Ring",                       genres: ["Action", "Role-Playing", "Open World", "Soulslike"]},
+  {title: "Cyberpunk 2077",                   genres: ["Action", "Role-Playing", "Open World", "First-Person Shooter"]},
+  {title: "God of War (2018)",                genres: ["Action", "Adventure", "Hack and Slash"]},
+  {title: "The Legend of Zelda: Breath of the Wild", genres: ["Action", "Adventure", "Open World"]},
+  {title: "Horizon Zero Dawn",                genres: ["Action", "Adventure", "Open World", "Role-Playing"]},
+  {title: "God of War Ragnarök",              genres: ["Action", "Adventure", "Hack and Slash"]},
+  {title: "Assassin's Creed Valhalla",        genres: ["Action", "Adventure", "Open World", "Role-Playing"]},
+  {title: "Spider-Man 2 (2023)",              genres: ["Action", "Adventure", "Open World"]},
+  {title: "Baldur's Gate 3",                  genres: ["Role-Playing", "Turn-Based Strategy", "Tactical RPG"]},
+  {title: "Hogwarts Legacy",                  genres: ["Action", "Role-Playing", "Open World", "Adventure"]},
+  {title: "Star Wars Jedi: Survivor",         genres: ["Action", "Adventure", "Soulslike"]},
+  {title: "Resident Evil Village",            genres: ["Horror", "Survival Horror", "Action"]},
+  {title: "Death Stranding Director's Cut",   genres: ["Action", "Adventure", "Simulation"]},
+  {title: "Control",                          genres: ["Action", "Adventure", "Third-Person Shooter"]},
+  {title: "Sekiro: Shadows Die Twice",        genres: ["Action", "Adventure", "Soulslike"]},
+  {title: "Doom Eternal",                     genres: ["First-Person Shooter", "Action"]},
+  {title: "Hades",                            genres: ["Action", "Roguelike", "Roguelite"]},
+  {title: "Ghost of Tsushima",                genres: ["Action", "Adventure", "Open World"]},
+  {title: "Animal Crossing: New Horizons",    genres: ["Simulation", "Casual"]},
+  {title: "Among Us",                         genres: ["Party", "Casual"]},
+  {title: "Fortnite",                         genres: ["Battle Royale", "Shooter", "Sandbox"]},
+  {title: "Valorant",                         genres: ["First-Person Shooter", "Tactical Shooter"]},
+  {title: "League of Legends",                genres: ["MOBA"]},
+  {title: "Counter-Strike 2",                 genres: ["First-Person Shooter", "Tactical Shooter"]},
+  {title: "Stardew Valley",                   genres: ["Simulation", "Role-Playing"]},
+  {title: "Terraria",                         genres: ["Sandbox", "Adventure", "Survival"]},
+  {title: "Hollow Knight",                    genres: ["Metroidvania", "Action", "Adventure"]},
+  {title: "Celeste",                          genres: ["Platformer"]},
+  {title: "Disco Elysium",                    genres: ["Role-Playing", "Adventure"]},
+  {title: "Outer Wilds",                      genres: ["Adventure", "Puzzle", "Exploration"]},
+  {title: "It Takes Two",                     genres: ["Action", "Adventure", "Co-op"]},
+  {title: "Portal 2",                         genres: ["Puzzle", "Platformer"]},
+  {title: "Half-Life 2",                      genres: ["First-Person Shooter", "Action"]},
+  {title: "BioShock Infinite",                genres: ["First-Person Shooter", "Action", "Adventure"]},
+  {title: "Mass Effect 2",                    genres: ["Role-Playing", "Action", "Third-Person Shooter"]},
+  {title: "The Last of Us Part I",            genres: ["Action", "Adventure", "Survival Horror"]},
+  {title: "The Last of Us Part II",           genres: ["Action", "Adventure", "Stealth"]},
+  {title: "Uncharted 4: A Thief's End",       genres: ["Action", "Adventure"]},
+  {title: "Tomb Raider (2013)",               genres: ["Action", "Adventure", "Survival"]},
+  {title: "Far Cry 5",                        genres: ["First-Person Shooter", "Open World", "Action"]},
+  {title: "Watch Dogs 2",                     genres: ["Action", "Adventure", "Open World"]},
+  {title: "Persona 5 Royal",                  genres: ["Role-Playing", "JRPG"]},
+  {title: "Final Fantasy VII Remake",         genres: ["Role-Playing", "Action"]},
+  {title: "Dragon Age: Inquisition",          genres: ["Role-Playing", "Open World"]},
+  {title: "Skyrim (The Elder Scrolls V)",     genres: ["Role-Playing", "Open World"]},
+  {title: "Fallout: New Vegas",               genres: ["Role-Playing", "Open World"]}
+] AS row
+MATCH (g:Game {title: row.title})
+UNWIND row.genres AS genreName
+MATCH (gen:Genre {name: genreName})
+MERGE (g)-[:HAS_GENRE]->(gen);
+
+// =================================================================
+// 3. POVEZIVANJE IGARA SA MEHANIKA  (:HAS_MECHANIC)
+// =================================================================
+
+UNWIND [
+  {title: "Grand Theft Auto V",               mechanics: ["Open-World", "Shooting", "Vehicle Driving", "Melee Combat", "Exploration"]},
+  {title: "Red Dead Redemption 2",            mechanics: ["Open-World", "Horse Riding", "Shooting", "Hunting", "Crafting", "Survival"]},
+  {title: "The Witcher 3: Wild Hunt",         mechanics: ["Open-World", "Melee Combat", "Magic System", "Dialogue Choices", "Exploration", "Skill Tree"]},
+  {title: "Minecraft",                        mechanics: ["Open-World", "Crafting", "Building", "Survival", "Exploration", "Procedural Generation"]},
+  {title: "Elden Ring",                       mechanics: ["Open-World", "Melee Combat", "Dodge & Roll", "Stamina Management", "Exploration", "Skill Tree"]},
+  {title: "Cyberpunk 2077",                   mechanics: ["Open-World", "Shooting", "Melee Combat", "Skill Tree", "Dialogue Choices"]},
+  {title: "God of War (2018)",                mechanics: ["Melee Combat", "Combo Attacks", "Puzzle Solving", "Exploration", "Quick Time Events"]},
+  {title: "The Legend of Zelda: Breath of the Wild", mechanics: ["Open-World", "Exploration", "Puzzle Solving", "Climbing", "Physics-based"]},
+  {title: "Horizon Zero Dawn",                mechanics: ["Open-World", "Shooting", "Crafting", "Exploration", "Trap Setting"]},
+  {title: "God of War Ragnarök",              mechanics: ["Melee Combat", "Combo Attacks", "Puzzle Solving", "Exploration"]},
+  {title: "Assassin's Creed Valhalla",        mechanics: ["Open-World", "Stealth", "Melee Combat", "Exploration", "Raft Sailing"]},
+  {title: "Spider-Man 2 (2023)",              mechanics: ["Open-World", "Parkour", "Combo Attacks", "Web Swinging"]},
+  {title: "Baldur's Gate 3",                  mechanics: ["Turn-Based Combat", "Dialogue Choices", "Skill Tree", "Party Management"]},
+  {title: "Hogwarts Legacy",                  mechanics: ["Open-World", "Magic System", "Exploration", "Spell Casting"]},
+  {title: "Star Wars Jedi: Survivor",         mechanics: ["Melee Combat", "Force Powers", "Exploration", "Platforming"]},
+  {title: "Resident Evil Village",            mechanics: ["Survival Horror", "Shooting", "Puzzle Solving", "Resource Management"]},
+  {title: "Death Stranding Director's Cut",   mechanics: ["Exploration", "Resource Management", "Traversal", "Building"]},
+  {title: "Control",                          mechanics: ["Shooting", "Telekinesis", "Exploration", "Puzzle Solving"]},
+  {title: "Sekiro: Shadows Die Twice",        mechanics: ["Melee Combat", "Dodge & Roll", "Parry", "Posture System"]},
+  {title: "Doom Eternal",                     mechanics: ["Shooting", "Melee Combat", "Glory Kills", "Resource Management"]},
+  {title: "Hades",                            mechanics: ["Roguelike Permadeath", "Melee Combat", "Dodge & Roll", "Procedural Generation"]},
+  {title: "Ghost of Tsushima",                mechanics: ["Open-World", "Stealth", "Melee Combat", "Exploration"]},
+  {title: "Animal Crossing: New Horizons",    mechanics: ["Resource Management", "Fishing", "Farming", "Day/Night Cycle"]},
+  {title: "Among Us",                         mechanics: ["Co-op Multiplayer", "Social Deduction"]},
+  {title: "Fortnite",                         mechanics: ["Battle Royale", "Building", "Shooting"]},
+  {title: "Valorant",                         mechanics: ["Shooting", "Tactical Shooter", "Ability Usage"]},
+  {title: "League of Legends",                mechanics: ["MOBA", "PvP Combat", "Skill Tree"]},
+  {title: "Counter-Strike 2",                 mechanics: ["Shooting", "Tactical Shooter"]},
+  {title: "Stardew Valley",                   mechanics: ["Farming", "Fishing", "Cooking", "Resource Management", "Day/Night Cycle"]},
+  {title: "Terraria",                         mechanics: ["Open-World", "Crafting", "Building", "Survival", "Exploration"]},
+  {title: "Hollow Knight",                    mechanics: ["Metroidvania", "Platforming", "Melee Combat", "Exploration"]},
+  {title: "Celeste",                          mechanics: ["Platforming", "Precision Jumping"]},
+  {title: "Disco Elysium",                    mechanics: ["Dialogue Choices", "Skill Tree", "Narrative Branching"]},
+  {title: "Outer Wilds",                      mechanics: ["Exploration", "Puzzle Solving", "Time Loop"]},
+  {title: "It Takes Two",                     mechanics: ["Co-op Multiplayer", "Puzzle Solving", "Platforming"]},
+  {title: "Portal 2",                         mechanics: ["Puzzle Solving", "Portal Gun", "Physics-based"]},
+  {title: "Half-Life 2",                      mechanics: ["Shooting", "Puzzle Solving", "Physics-based"]},
+  {title: "BioShock Infinite",                mechanics: ["Shooting", "Vigors", "Skyline Traversal"]},
+  {title: "Mass Effect 2",                    mechanics: ["Shooting", "Dialogue Choices", "Squad Commands"]},
+  {title: "The Last of Us Part I",            mechanics: ["Stealth", "Shooting", "Resource Management", "Cover Shooter"]},
+  {title: "The Last of Us Part II",           mechanics: ["Stealth", "Melee Combat", "Shooting", "Crafting"]},
+  {title: "Uncharted 4: A Thief's End",       mechanics: ["Shooting", "Platforming", "Puzzle Solving"]},
+  {title: "Tomb Raider (2013)",               mechanics: ["Shooting", "Survival", "Exploration", "Crafting"]},
+  {title: "Far Cry 5",                        mechanics: ["Open-World", "Shooting", "Stealth", "Companion AI"]},
+  {title: "Watch Dogs 2",                     mechanics: ["Open-World", "Hacking", "Stealth", "Shooting"]},
+  {title: "Persona 5 Royal",                  mechanics: ["Turn-Based Combat", "Social Links", "Dungeon Crawling"]},
+  {title: "Final Fantasy VII Remake",         mechanics: ["Real-Time Combat", "ATB System", "Materias"]},
+  {title: "Dragon Age: Inquisition",          mechanics: ["Open-World", "Real-Time Combat", "Party Management"]},
+  {title: "Skyrim (The Elder Scrolls V)",     mechanics: ["Open-World", "Skill Tree", "Exploration", "Magic System"]},
+  {title: "Fallout: New Vegas",               mechanics: ["Open-World", "Shooting", "Dialogue Choices", "Skill Tree"]}
+] AS row
+MATCH (g:Game {title: row.title})
+UNWIND row.mechanics AS mechName
+MATCH (m:Mechanic {name: mechName})
+MERGE (g)-[:HAS_MECHANIC]->(m);
+
+RETURN "Sve relacije su dodane – developeri, žanrovi i mehanike!";
+
+// --- Fix image extensions to .webp for frontend assets (idempotent)
+MATCH (g:Game)
+WHERE g.imagePath ENDS WITH '.jpg'
+SET g.imagePath = replace(g.imagePath, '.jpg', '.webp')
+RETURN count(g) AS updatedImagePaths;

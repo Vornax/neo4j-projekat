@@ -1,0 +1,7 @@
+version: '3.9'
+
+services:
+  backend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+

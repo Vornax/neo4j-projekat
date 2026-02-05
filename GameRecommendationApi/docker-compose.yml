@@ -1,0 +1,47 @@
+version: '3.9'   # verzija compose fajla – 3.8/3.9 su najkompatibilnije
+
+services: # Ovde definišeš kontejnere(servise) koje želiš da pokreneš
+
+  neo4j:
+    image: neo4j:5   # konkretna verzija
+    container_name: game-rec-neo4j   # lepo ime u docker ps
+    restart: unless-stopped   # ako se sruši, sam se restartuje (osim ako ga ručno stopiraš)
+    
+    ports:
+      - "7474:7474"     # Neo4j Browser[](http://localhost:7474)
+      - "7687:7687"     # Bolt protokol – za konekciju iz .NET drivera
+    
+    volumes:
+      - neo4j-data:/data               # folder unutar kontejnera gde Neo4j čuva bazu
+      - ./neo4j-seed:/docker-entrypoint-initdb.d   # tu ide tvoj 01-seed.cypher
+
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH}   # prosledi samo NEO4J_AUTH u Neo4j kontejner (ostalo ide backendu)
+
+
+  backend:
+    build: .                           # gradi iz Dockerfile-a, taj dockerfile treba d bude u istom folderu
+    container_name: game-rec-api
+    restart: unless-stopped
+    
+    ports:
+      - "5257:5257"                    # mapiramo tvoj port napolje
+    
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5257
+      # Sve ostale varijable dolaze iz .env fajla
+      # (Neo4j__Uri ćeš override-ovati dole)
+    
+    env_file:
+      - .env                           # učitava tvoj .env fajl
+    
+    depends_on:
+      - neo4j                        # pokreće Neo4j pre backend-a
+    
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # ako ti treba pristup host mašini
+
+volumes:
+  neo4j-data:
+

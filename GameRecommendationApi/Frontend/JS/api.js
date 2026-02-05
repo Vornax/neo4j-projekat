@@ -9,7 +9,7 @@ import { API_BASE, normalizeImagePath, apiFetch } from './utils.js';
 //Preuzima sve igre sa servera
 export async function fetchAllGames() {
     try {
-        const res = await apiFetch(`${API_BASE}/all`);
+        const res = await apiFetch(`${API_BASE}/all?maxResults=1000`);
         if (!res.ok) throw new Error('Mrežna greška pri dobijanju svih igara');
         const data = await res.json();
         return data.map(g => normalizeImagePath(g));
