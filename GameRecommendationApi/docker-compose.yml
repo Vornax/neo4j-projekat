@@ -1,31 +1,30 @@
-version: '3.9'   # verzija compose fajla – 3.8/3.9 su najkompatibilnije
+version: '3.9'   #  kaže Dockeru koju verziju pravila za pisanje ovog fajla da koristi
 
-services: # Ovde definišeš kontejnere(servise) koje želiš da pokreneš
+services: # Ovde se definišu kontejnere(servise) koji se pokrecu
 
   neo4j:
     image: neo4j:5   # konkretna verzija
-    container_name: game-rec-neo4j   # lepo ime u docker ps
-    restart: unless-stopped   # ako se sruši, sam se restartuje (osim ako ga ručno stopiraš)
+    container_name: game-rec-neo4j   # ime u docker-u
+    restart: unless-stopped   # ako se sruši, sam se restartuje
     
     ports:
-      - "7474:7474"     # Neo4j Browser[](http://localhost:7474)
-      - "7687:7687"     # Bolt protokol – za konekciju iz .NET drivera
+      - "7474:7474"     # port za Neo4j Web Interfejs (http://localhost:7474)
+      - "7687:7687"     # port preko kog Backend(kod) priča sa bazom
     
     volumes:
-      - neo4j-data:/data               # folder unutar kontejnera gde Neo4j čuva bazu
-      - ./neo4j-seed:/docker-entrypoint-initdb.d   # tu ide tvoj 01-seed.cypher
+      - neo4j-data:/data               # Sve što Neo4j sačuva u /data (gde inače čuva grafove), preusmeravamo van kontejnera na mesto neo4j-data
+      - ./neo4j-seed:/docker-entrypoint-initdb.d   # zove moju skriptu sa kojom puni bazu
 
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH}   # prosledi samo NEO4J_AUTH u Neo4j kontejner (ostalo ide backendu)
-
+      - NEO4J_AUTH=${NEO4J_AUTH}   # kontejneru treba sifra, ta sifra se vuce iz .env fajla
 
   backend:
-    build: .                           # gradi iz Dockerfile-a, taj dockerfile treba d bude u istom folderu
+    build: .                           # gradi contajner na osnovu Dockerfile-a koji je u istom folderu
     container_name: game-rec-api
     restart: unless-stopped
     
     ports:
-      - "5257:5257"                    # mapiramo tvoj port napolje
+      - "5257:5257"                    # port na kom ce biti container
     
     environment:
       ASPNETCORE_ENVIRONMENT: Development
@@ -34,13 +33,13 @@ services: # Ovde definišeš kontejnere(servise) koje želiš da pokreneš
       # (Neo4j__Uri ćeš override-ovati dole)
     
     env_file:
-      - .env                           # učitava tvoj .env fajl
+      - .env                           # kada se pali bekcend svi potrebni podaci se vuku iz .env 
     
     depends_on:
       - neo4j                        # pokreće Neo4j pre backend-a
     
     extra_hosts:
-      - "host.docker.internal:host-gateway"   # ako ti treba pristup host mašini
+      - "host.docker.internal:host-gateway"   # da bi pristupi host mašini
 
 volumes:
   neo4j-data:

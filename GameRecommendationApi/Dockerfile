@@ -2,48 +2,45 @@
 # Faza 1 – iskompajlira projekat i pravi gotovu verziju aplikacije
 # ────────────────────────────────────────────────────────────────
 
-# uzimamo startni image dotneta
+# skida image dotneta
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build 
 
-# Postavljamo radni direktorijum unutar imiga
+# Napravi folder /src unutar kontejnera i uđi u njega 
 WORKDIR /src
 
-# Kopiramo samo .csproj fajlove, ako u src
+# Kopiramo samo .csproj fajlove sa kompjutera u kontejner, da bi iz tih fajlova Docker mogao da vidi koje pakete treba da skine 
 COPY *.csproj .
 
-# ova linija procita .cprosj i iz njih vidi koji su paketi potrebni i skine ih
+# skida sve NuGet pakete (biblioteke) koje projektu trebaju 
 RUN dotnet restore
 
-# Kopiramo sav ostali kod
+# Kopiramo sav ostali kod iz foldera u kontejner
 COPY . .
 
-# Docker privremeno pokrene mini računar i ukuca ovu komandu u terminal
-# publish  - pravi verziju aplikacije koja može odmah da se pokrene
-# -o = output folder /app/publish unutar image-a
-# --no-restore = ne radi ponovo restore jer smo to već uradili
+# Kompajlira kod za produkciju(Release), spakuje ga i fajlove u folder /app/publish. 
+# Opcija --no-restore kaže: "Ne skidaj pakete opet, već smo to uradili iznad"
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
 # ────────────────────────────────────────────────────────────────
 # Faza 2 – pravi mali finalni image koji samo pokreće aplikaciju
 # ────────────────────────────────────────────────────────────────
 
-# Docker počinje novi image od nule, ali koristi sliku sa dotnet runtime-om
+# Docker počinje novi image koji je baziran na ASP.NET runtime image-u (koji je manji od SDK image-a)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# pravi folder UNUTAR runtime image-a
+# Napravi folder /app unutar kontejnera i uđi u njega 
 WORKDIR /app
 
-# uzali u img bild u njen /app/publish i kopira sve fajlove u ovaj img final
+# uzali u img bild u njen /app/publish i kopira sve fajlove u ovaj img final u folder /app
 COPY --from=build /app/publish .
 
-# Ensure frontend static assets are present in the final image (so /images works)
+# uzali u img bild u njen /src/Frontend i kopira sve fajlove u ovaj img final u folder /app/Frontend
 COPY --from=build /src/Frontend ./Frontend
 
-# Izlažemo port na kome sluša aplikacija 
+# otvara port 5257, koji je port na kojem će aplikacija slušati unutar kontejnera
 EXPOSE 5257
 
-# Postavljamo environment varijablu da aplikacija zna da radi u Dockeru
-# (možeš koristiti za različito ponašanje ako želiš)
+# postavlja environment na "Development", što omogućava detaljnije greške 
 ENV ASPNETCORE_ENVIRONMENT=Development
 
 # Kažemo Docker-u koja komanda treba da se pokrene kad se kontejner startuje

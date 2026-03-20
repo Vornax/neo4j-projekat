@@ -1,30 +1,48 @@
 
-1. Kloniraj i uđi u direktorijum
-  git clone <repo-url>
-  cd GameRecommendationApi
+Ovaj projekat koristi Docker okruženje kako bi se baza podataka (Neo4j), Backend API (.NET 8) i Frontend pokrenuli brzo.
 
-2. Podigni kontejnere (safe — kreira volume i izvrši seed ako je data-folder prazan)
-  docker compose pull
-  docker compose up -d
+🛠️ Preduslovi za pokretanje
 
-3. Sačekaj da Neo4j bude spreman (čekaj dok log ne pokaže Started) i proveri seed:
-  docker compose logs neo4j --tail 50 --follow
+Da biste pokrenuli projekat, potrebno je da imate instalirano:
 
-4. ako je baza prazna — eksplicitno pokreni seed skriptu 
-type .\neo4j-seed\01-seed.cypher | docker exec -i game-rec-neo4j bin/cypher-shell -u neo4j -p 'sifra'
+- Docker Desktop (upaljen i aktivan u pozadini)
+- Git (za preuzimanje repozitorijuma)
 
-5. Verifikuj da je DB popunjena (očekivano: 50)
-  docker exec -i game-rec-neo4j bin/cypher-shell -u neo4j -p 'sifra' "MATCH (g:Game) RETURN count(g) AS games;"
 
-//Očekivani izlaz: games = 50
+🚀 Uputstvo za pokretanje 
 
-Ako nakon pokretanja baza ostane PRAZNA — brzo dijagnostičke komande 🩺
 
--Da li postoji volume?
-  docker volume ls | Select-String neo4j
+1. Kloniranje repozitorijuma i pozicioniranje u folder
 
--Da li seed nije pokrenut / ima grešaka u logu?
-  docker compose logs neo4j --tail 200
+Otvorite terminal (Command Prompt, PowerShell ili Git Bash) i unesite:
 
-Ponovno seedovanje (sigurno):
-  type .\neo4j-seed\01-seed.cypher | docker exec -i game-rec-neo4j bin/cypher-shell -u neo4j -p 'sifra'
+git clone <link_do_github_repozitorijuma>
+cd <ime_foldera>
+
+2. Podešavanje promenljivih okruženja (.env)
+
+Projekat koristi .env fajl za čuvanje kredencijala baze i API ključeva, koji iz bezbednosnih razloga nije na GitHub-u.
+
+Pronađite fajl koji se zove .env.example.
+Napravite kopiju tog fajla i preimenujte je u .env
+(Opciono) Otvorite .env i izmenite šifre po želji, ili jednostavno ostavite defaultne vrednosti koje su već tu pripremljene za testiranje.
+
+3. Pokretanje Docker kontejnera
+
+U terminalu (u root folderu projekta gde se nalazi docker-compose.yml), ukucajte sledeću komandu:
+docker-compose up -d --build
+
+4. Pristup aplikaciji
+
+Kada terminal završi proces, celokupan sistem je aktivan! Otvorite vaš web pretraživač i posetite sledeće linkove:
+
+- 🌐 Glavni Web Sajt (Frontend): Frontend > index.html > desni klik > open with live server
+- ⚙️ API Dokumentacija (Swagger): http://localhost:5257/swagger 
+- 🗄️ Baza Podataka (Neo4j Browser): http://localhost:7474
+(Za autorizaciju na swagger koristiti podatak iz .env AUTHORIZATION_APIKEY)
+
+
+!!! da bi sve radilo u .env polja AUTHORIZATION_APIKEY i Authorization__ApiKey moraju da sadrze istu sifru kao i promenjiva API_KEY u utils.js !!!
+
+
+
